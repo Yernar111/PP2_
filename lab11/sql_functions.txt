@@ -1,0 +1,62 @@
+CREATE OR REPLACE FUNCTION func1(n text)
+RETURNS TABLE(result varchar) AS $$
+BEGIN
+    IF n = 'phone_number' THEN
+        RETURN QUERY EXECUTE 'SELECT phone_number::varchar FROM phone_book1';
+    ELSIF n = 'user_name' THEN
+        RETURN QUERY EXECUTE 'SELECT user_name FROM phone_book1';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-------------------------------------------------------------------------------
+
+CREATE OR REPLACE PROCEDURE func2(a int, b varchar)
+AS $$
+BEGIN
+    if exists(
+        select user_name from phone_book1 where user_name = b
+    ) THEN
+        update phone_book1 set phone_number=a where user_name = b;
+    else
+        insert into phone_book1 (phone_number, user_name) values (a,b);
+    end if;
+END;
+$$ LANGUAGE plpgsql;
+
+---------------------------------------------------------------------------------
+
+CREATE OR REPLACE PROCEDURE func3(
+    phone_numbers int[], user_names varchar[], n int
+)
+AS $$
+BEGIN
+    FOR i IN 1 .. n LOOP
+        INSERT INTO phone_book1(phone_number, user_name) VALUES (phone_numbers[i], user_names[i]);
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+----------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION func4(a TEXT, b int, c int)
+RETURNS TABLE(result varchar) AS $$
+BEGIN
+    RETURN QUERY EXECUTE format('SELECT %s::varchar FROM phone_book1 LIMIT %s OFFSET %s', a, b, c);
+END;
+$$ LANGUAGE plpgsql;
+
+----------------------------------------------------------------------------------
+
+CREATE OR REPLACE PROCEDURE func5(a varchar)
+AS $$
+BEGIN
+    if exists(
+        select phone_number from phone_book1 where phone_number::varchar = a
+    ) THEN
+        delete from phone_book1 where phone_number::varchar = a; 
+    else
+        delete from phone_book1 where user_name = a; 
+    end if;
+END;
+$$ LANGUAGE plpgsql;
