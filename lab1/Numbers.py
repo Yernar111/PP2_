@@ -11,9 +11,9 @@ b = int(y)
 #convert from int to complex:
 c = complex(x)
 
-print(a)
-print(b)
-print(c)
+print(a) # 1.0
+print(b) # 2
+print(c) # (1+0j)
 
 print(type(a))
 print(type(b))
